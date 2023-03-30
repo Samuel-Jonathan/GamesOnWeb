@@ -31,6 +31,7 @@
     <canvas id="renderCanvas" width="1000px" height="1000px"></canvas>
 
     <script>
+
         // Créer le moteur de rendu
         var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
@@ -52,14 +53,73 @@
         // Ajouter une lumière
         var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
 
-        BABYLON.SceneLoader.ImportMesh("", "", "walking.glb", scene, function (meshes, particleSystems, skeletons) {
+
+
+        BABYLON.SceneLoader.ImportMesh("", "", "walking.glb", scene, function (meshes, particleSystems, skeletons, animationGroups) {
             // Le premier mesh dans la liste est le mesh du personnage
             playerMesh = meshes[0];
             // Désactiver le mesh du personnage par défaut
-            playerMesh.setEnabled(false);
+            playerMesh.setEnabled(true);
             // Les squelettes du personnage sont stockés dans un tableau
             playerSkeletons = skeletons;
+
+            var anim_walk = animationGroups[0];
+
+
+            if (anim_walk) {
+                anim_walk.play();
+            }
+
+            var walkRange = skeletons[0].getAnimationRange("walking.glb");
+            scene.beginAnimation(skeletons[0], 0, 2, true,1.0);
+            /*  var time = 60;
+              scene.registerAfterRender(function () {
+  
+                  time--;
+                  if(time <= 0){
+                      playerMesh.position.z += 3;
+                      time = 60;
+                  }
+                  
+  
+  
+                  console.log(playerMesh.position.z);
+              });*/
+            // Crée une boucle d'animation pour la marche
+
+            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+            var UiPanel = new BABYLON.GUI.StackPanel();
+            UiPanel.width = "220px";
+            UiPanel.fontSize = "14px";
+            UiPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+            UiPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+            advancedTexture.addControl(UiPanel);
+            // ..
+            var button = BABYLON.GUI.Button.CreateSimpleButton("but1", "animate_start1");
+            button.paddingTop = "10px";
+            button.width = "100px";
+            button.height = "50px";
+            button.color = "white";
+            button.background = "green";
+            button.onPointerDownObservable.add(() => {
+                animationGroups[0].play(true)
+            });
+            UiPanel.addControl(button);
+            // ..
+            var button1 = BABYLON.GUI.Button.CreateSimpleButton("but2", "animate_stop1");
+            button1.paddingTop = "10px";
+            button1.width = "100px";
+            button1.height = "50px";
+            button1.color = "white";
+            button1.background = "green";
+            button1.onPointerDownObservable.add(() => {
+                animationGroups[0].pause()
+            });
+            UiPanel.addControl(button1);
+
         });
+
+
 
         // Ecouteur d'événement pour la touche espace
         window.addEventListener('keydown', function (event) {
