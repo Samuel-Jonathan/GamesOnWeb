@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GamesOnWeb</title>
+    <!-- Chargement des bibliothèques Babylon.js -->
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script src="https://cdn.babylonjs.com/babylon.max.js"></script>
     <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
@@ -30,7 +31,6 @@
     <canvas id="renderCanvas" width="1000px" height="1000px"></canvas>
 
     <script>
-
         // Créer le moteur de rendu
         var canvas = document.getElementById("renderCanvas");
         var engine = new BABYLON.Engine(canvas, true);
@@ -45,35 +45,30 @@
         // Ajouter une lumière
         var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
 
-        // Crée une boîte de 2m de large, 3m de haut, 0,2m d'épaisseur
-        var wall = BABYLON.MeshBuilder.CreateBox("wall", { width: 7, height: 5, depth: 0.2 }, scene);
+        // Chargement du modèle de personnage et de l'animation
+        var playerMesh;
+        var playerSkeletons;
 
-        // Positionne le mur à 1 mètre devant la caméra
-        wall.position = new BABYLON.Vector3(0, 0, 1);
+        // Ajouter une lumière
+        var light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
 
-        // Applique une texture au mur
-        var wallMaterial = new BABYLON.StandardMaterial("wallMaterial", scene);
-        wallMaterial.diffuseTexture = new BABYLON.Texture("wall.jpg", scene);
-        wallMaterial.diffuseTexture.uScale = 1; // Répète la texture deux fois en largeur
-        wallMaterial.diffuseTexture.vScale = 1; // Répète la texture trois fois en hauteur
-        wall.material = wallMaterial;
+        BABYLON.SceneLoader.ImportMesh("", "", "walking.glb", scene, function (meshes, particleSystems, skeletons) {
+            // Le premier mesh dans la liste est le mesh du personnage
+            playerMesh = meshes[0];
+            // Désactiver le mesh du personnage par défaut
+            playerMesh.setEnabled(false);
+            // Les squelettes du personnage sont stockés dans un tableau
+            playerSkeletons = skeletons;
+        });
 
-
-        //Crée le sol
-        var ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 100, height: 100, subdivisions: 2 }, scene);
-
-        //Ajoute une texture au sol
-        var groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture("ground.png", scene);
-        groundMaterial.diffuseTexture.uScale = 50; // Répète la texture deux fois en largeur
-        groundMaterial.diffuseTexture.vScale = 50; // Répète la texture trois fois en hauteur
-        ground.material = groundMaterial;
-
-
-        ground.receiveShadows = true;
-
-        //Position du sol
-        ground.position.y = -2.5;
+        // Ecouteur d'événement pour la touche espace
+        window.addEventListener('keydown', function (event) {
+            // La touche espace est représentée par le code 32
+            if (event.keyCode === 32) {
+                // Activer le mesh du personnage lorsque la touche est enfoncée
+                playerMesh.setEnabled(true);
+            }
+        });
 
         // Afficher la scène
         engine.runRenderLoop(function () {
