@@ -70,54 +70,41 @@
                 anim_walk.play();
             }
 
-            var walkRange = skeletons[0].getAnimationRange("walking.glb");
-            scene.beginAnimation(skeletons[0], 0, 2, true,1.0);
-            /*  var time = 60;
-              scene.registerAfterRender(function () {
-  
-                  time--;
-                  if(time <= 0){
-                      playerMesh.position.z += 3;
-                      time = 60;
-                  }
-                  
-  
-  
-                  console.log(playerMesh.position.z);
-              });*/
-            // Crée une boucle d'animation pour la marche
-
-            var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-            var UiPanel = new BABYLON.GUI.StackPanel();
-            UiPanel.width = "220px";
-            UiPanel.fontSize = "14px";
-            UiPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-            UiPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-            advancedTexture.addControl(UiPanel);
-            // ..
-            var button = BABYLON.GUI.Button.CreateSimpleButton("but1", "animate_start1");
-            button.paddingTop = "10px";
-            button.width = "100px";
-            button.height = "50px";
-            button.color = "white";
-            button.background = "green";
-            button.onPointerDownObservable.add(() => {
-                animationGroups[0].play(true)
-            });
-            UiPanel.addControl(button);
-            // ..
-            var button1 = BABYLON.GUI.Button.CreateSimpleButton("but2", "animate_stop1");
-            button1.paddingTop = "10px";
-            button1.width = "100px";
-            button1.height = "50px";
-            button1.color = "white";
-            button1.background = "green";
-            button1.onPointerDownObservable.add(() => {
-                animationGroups[0].pause()
-            });
-            UiPanel.addControl(button1);
+            playerMesh.position.z += 1;
 
         });
+        // Crée une boucle d'animation pour la marche
+
+        var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        var UiPanel = new BABYLON.GUI.StackPanel();
+        UiPanel.width = "220px";
+        UiPanel.fontSize = "14px";
+        UiPanel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+        UiPanel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+        advancedTexture.addControl(UiPanel);
+        // ..
+        var button = BABYLON.GUI.Button.CreateSimpleButton("but1", "animate_start1");
+        button.paddingTop = "10px";
+        button.width = "100px";
+        button.height = "50px";
+        button.color = "white";
+        button.background = "green";
+        button.onPointerDownObservable.add(() => {
+            animationGroups[0].play(true)
+        });
+        UiPanel.addControl(button);
+        // ..
+        var button1 = BABYLON.GUI.Button.CreateSimpleButton("but2", "animate_stop1");
+        button1.paddingTop = "10px";
+        button1.width = "100px";
+        button1.height = "50px";
+        button1.color = "white";
+        button1.background = "green";
+        button1.onPointerDownObservable.add(() => {
+            animationGroups[0].pause()
+        });
+        UiPanel.addControl(button1);
+
 
 
 
