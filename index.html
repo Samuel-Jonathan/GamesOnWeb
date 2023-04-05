@@ -59,95 +59,105 @@
             // Les squelettes du personnage sont stockés dans un tableau
             playerSkeletons = skeletons;
 
+            let isForward = false;
+            let isBackward = false;
+            let isLeft = false;
+            let isRight = false;
 
+            let isLooking = "forward";
 
-            playerMesh.position.z += 3;
-            animationGroups[0].pause();
-
-            isDown = false;
-            isLeft = false;
-            isRight = false;
 
             // Faire suivre la caméra au personnage
             camera.lockedTarget = playerMesh;
-            var timer = 0;
+
             scene.onKeyboardObservable.add((kbInfo) => {
                 switch (kbInfo.type) {
                     case BABYLON.KeyboardEventTypes.KEYDOWN:
                         switch (kbInfo.event.key) {
                             case "ArrowUp":
-                                playerMesh.position.z -= 0.05;
-                                animation();
-
+                                if (!isForward && isLooking == "backward") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+                                } else if (!isForward && isLooking == "left") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.LOCAL);
+                                } else if (!isForward && isLooking == "right") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, -Math.PI / 2, BABYLON.Space.LOCAL);
+                                }
+                                isLooking = "forward";
+                                isForward = true;
                                 break;
                             case "ArrowDown":
-                                playerMesh.position.z += 0.05;
-                                animation();
-                                if (!isDown) {
-                                    isDown = true;
+                                if (!isBackward && isLooking == "forward") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+                                } else if (!isBackward && isLooking == "left") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, -Math.PI / 2, BABYLON.Space.LOCAL);
+                                } else if (!isBackward && isLooking == "right") {
                                     playerMesh.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.LOCAL);
                                 }
-
-                                animationGroups[0].play(true);
+                                isLooking = "backward";
+                                isBackward = true;
                                 break;
                             case "ArrowLeft":
-                                playerMesh.position.x += 0.05;
-                                animation();
-                                if (!isLeft) {
-                                    isLeft = true;
+                                if (!isLeft && isLooking == "right") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+                                } else if (!isLeft && isLooking == "forward") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, -Math.PI / 2, BABYLON.Space.LOCAL);
+                                } else if (!isLeft && isLooking == "backward") {
                                     playerMesh.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.LOCAL);
                                 }
-                                animationGroups[0].play(true);
+
+                                isLooking = "left";
+                                isLeft = true;
                                 break;
                             case "ArrowRight":
-                                playerMesh.position.x -= 0.05;
-                                animation();
-                                if (!isRight) {
-                                    isRight = true;
+                                if (!isRight && isLooking == "left") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, -Math.PI, BABYLON.Space.LOCAL);
+                                } else if (!isRight && isLooking == "forward") {
                                     playerMesh.rotate(BABYLON.Axis.Y, Math.PI / 2, BABYLON.Space.LOCAL);
+                                } else if (!isRight && isLooking == "backward") {
+                                    playerMesh.rotate(BABYLON.Axis.Y, -Math.PI / 2, BABYLON.Space.LOCAL);
                                 }
-                                animationGroups[0].play(true);
+                                isLooking = "right";
+                                isRight = true;
                                 break;
-
                         }
-
-                        break;
                 }
-
-
             });
-
-            function animation() {
-                timer--;
-                if (timer <= 0) {
-                    animationGroups[0].play();
-                    timer = 5;
-                }
-            }
-
 
             scene.onKeyboardObservable.add((kbInfo) => {
                 switch (kbInfo.type) {
                     case BABYLON.KeyboardEventTypes.KEYUP:
                         switch (kbInfo.event.key) {
                             case "ArrowUp":
-                                animationGroups[0].pause();
+                                isForward = false;
                                 break;
                             case "ArrowDown":
-                                isDown = false;
-
-                                animationGroups[0].pause();
+                                isBackward = false;
                                 break;
                             case "ArrowLeft":
                                 isLeft = false;
-
-                                animationGroups[0].pause();
                                 break;
                             case "ArrowRight":
                                 isRight = false;
-                                animationGroups[0].pause();
                                 break;
                         }
+                }
+            });
+
+            scene.registerBeforeRender(function () {
+                if (isForward) {
+                    animationGroups[0].play();
+                    playerMesh.position.z -= 0.05;
+                } else if (isBackward) {
+                    animationGroups[0].play();
+                    playerMesh.position.z += 0.05;
+                } else if (isLeft) {
+                    animationGroups[0].play();
+                    playerMesh.position.x += 0.05;
+                } else if (isRight) {
+                    animationGroups[0].play();
+                    playerMesh.position.x -= 0.05;
+                } else {
+                    animationGroups[0].pause();
                 }
             });
 
@@ -155,6 +165,9 @@
             playerMesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
 
         });
+
+
+
 
         // Crée une boîte de 2m de large, 3m de haut, 0,2m d'épaisseur
         var wall = BABYLON.MeshBuilder.CreateBox("wall", { width: 28, height: 10, depth: 0.2 }, scene);
@@ -226,13 +239,13 @@
 
 
         // Ecouteur d'événement pour la touche espace
-        window.addEventListener('keydown', function (event) {
-            // La touche espace est représentée par le code 32
-            if (event.keyCode === 32) {
-                // Activer le mesh du personnage lorsque la touche est enfoncée
-                playerMesh.setEnabled(true);
-            }
-        });
+        /*  window.addEventListener('keydown', function (event) {
+              // La touche espace est représentée par le code 32
+              if (event.keyCode === 32) {
+                  // Activer le mesh du personnage lorsque la touche est enfoncée
+                  playerMesh.setEnabled(true);
+              }
+          });*/
 
         // Afficher la scène
         engine.runRenderLoop(function () {
